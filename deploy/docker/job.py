@@ -43,6 +43,7 @@ class CrawlJobPayload(BaseModel):
     urls:           list[HttpUrl]
     browser_config: Dict = {}
     crawler_config: Dict = {}
+    use_oxylabs_proxy: bool = False
 
 
 # ---------- LL​M job ---------------------------------------------------------
@@ -89,6 +90,7 @@ async def crawl_job_enqueue(
         payload.browser_config,
         payload.crawler_config,
         config=_config,
+        use_oxylabs_proxy=payload.use_oxylabs_proxy
     )
 
 

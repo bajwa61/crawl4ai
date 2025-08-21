@@ -8,6 +8,7 @@ class CrawlRequest(BaseModel):
     urls: List[str] = Field(min_length=1, max_length=100)
     browser_config: Optional[Dict] = Field(default_factory=dict)
     crawler_config: Optional[Dict] = Field(default_factory=dict)
+    use_oxylabs_proxy: Optional[bool] = Field(default=False, description="Use OxyLabs proxy for crawling")
 
 class MarkdownRequest(BaseModel):
     """Request body for the /md endpoint."""

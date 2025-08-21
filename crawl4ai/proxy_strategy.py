@@ -156,3 +156,24 @@ class RoundRobinProxyStrategy:
         if not self._proxy_cycle:
             return None
         return next(self._proxy_cycle)
+
+
+class OxyLabsProxyStrategy(ProxyRotationStrategy):
+    """OxyLabs proxy strategy using environment variables"""
+
+    def __init__(self):
+        """Initialize OxyLabs proxy strategy"""
+        self._proxy = None
+        try:
+            from .async_configs import ProxyConfig
+            self._proxy = ProxyConfig.oxylabs()
+        except Exception as e:
+            print(f"Failed to initialize OxyLabs proxy: {e}")
+        
+    def add_proxies(self, proxies: List[ProxyConfig]):
+        """Not applicable for OxyLabs single proxy strategy"""
+        pass
+    
+    async def get_next_proxy(self) -> Optional[ProxyConfig]:
+        """Get OxyLabs proxy configuration"""
+        return self._proxy

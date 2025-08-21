@@ -419,7 +419,8 @@ async def handle_crawl_request(
     urls: List[str],
     browser_config: dict,
     crawler_config: dict,
-    config: dict
+    config: dict,
+    use_oxylabs_proxy: bool = False
 ) -> dict:
     """Handle non-streaming crawl requests."""
     start_mem_mb = _get_memory_mb() # <--- Get memory before
@@ -431,7 +432,22 @@ async def handle_crawl_request(
         urls = [('https://' + url) if not url.startswith(('http://', 'https://')) else url for url in urls]
         browser_config = BrowserConfig.load(browser_config)
         crawler_config = CrawlerRunConfig.load(crawler_config)
-
+        
+        if use_oxylabs_proxy:
+            from crawl4ai import ProxyConfig
+            from crawl4ai.proxy_strategy import OxyLabsProxyStrategy
+                
+            # Create and validate proxy config
+            proxy_config = ProxyConfig.oxylabs()
+            logger.info(f"OxyLabs proxy configured: {proxy_config.server}")
+                
+            # Set proxy on crawler config
+            crawler_config.proxy_config = proxy_config
+                
+            # Also set rotation strategy for full compatibility
+            oxylabs_strategy = OxyLabsProxyStrategy()
+            crawler_config.proxy_rotation_strategy = oxylabs_strategy
+                
         dispatcher = MemoryAdaptiveDispatcher(
             memory_threshold_percent=config["crawler"]["memory_threshold_percent"],
             rate_limiter=RateLimiter(
@@ -513,7 +529,8 @@ async def handle_stream_crawl_request(
     urls: List[str],
     browser_config: dict,
     crawler_config: dict,
-    config: dict
+    config: dict,
+    use_oxylabs_proxy: bool = False
 ) -> Tuple[AsyncWebCrawler, AsyncGenerator]:
     """Handle streaming crawl requests."""
     try:
@@ -523,7 +540,22 @@ async def handle_stream_crawl_request(
         crawler_config = CrawlerRunConfig.load(crawler_config)
         crawler_config.scraping_strategy = LXMLWebScrapingStrategy()
         crawler_config.stream = True
-
+        
+        if use_oxylabs_proxy:
+            from crawl4ai import ProxyConfig
+            from crawl4ai.proxy_strategy import OxyLabsProxyStrategy
+                
+            # Create and validate proxy config
+            proxy_config = ProxyConfig.oxylabs()
+            logger.info(f"OxyLabs proxy configured: {proxy_config.server}")
+                
+            # Set proxy on crawler config
+            crawler_config.proxy_config = proxy_config
+                
+            # Also set rotation strategy for full compatibility
+            oxylabs_strategy = OxyLabsProxyStrategy()
+            crawler_config.proxy_rotation_strategy = oxylabs_strategy
+                
         dispatcher = MemoryAdaptiveDispatcher(
             memory_threshold_percent=config["crawler"]["memory_threshold_percent"],
             rate_limiter=RateLimiter(
@@ -567,6 +599,7 @@ async def handle_crawl_job(
     browser_config: Dict,
     crawler_config: Dict,
     config: Dict,
+    use_oxylabs_proxy: bool = False
 ) -> Dict:
     """
     Fire-and-forget version of handle_crawl_request.
@@ -589,6 +622,7 @@ async def handle_crawl_job(
                 browser_config=browser_config,
                 crawler_config=crawler_config,
                 config=config,
+                use_oxylabs_proxy=use_oxylabs_proxy
             )
             await redis.hset(f"task:{task_id}", mapping={
                 "status": TaskStatus.COMPLETED,

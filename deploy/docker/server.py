@@ -442,6 +442,7 @@ async def crawl(
         browser_config=crawl_request.browser_config,
         crawler_config=crawl_request.crawler_config,
         config=config,
+        use_oxylabs_proxy=crawl_request.use_oxylabs_proxy
     )
     return JSONResponse(res)
 
@@ -460,6 +461,7 @@ async def crawl_stream(
         browser_config=crawl_request.browser_config,
         crawler_config=crawl_request.crawler_config,
         config=config,
+        use_oxylabs_proxy=crawl_request.use_oxylabs_proxy
     )
     return StreamingResponse(
         stream_results(crawler, gen),

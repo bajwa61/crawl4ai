@@ -303,6 +303,30 @@ class ProxyConfig:
             print(f"Error loading proxies from environment: {e}")
         return proxies
     
+    @staticmethod
+    def oxylabs() -> "ProxyConfig":
+        """Create Oxylabs Datacenter proxy config from env vars."""
+        username = os.getenv("OXYLABS_USERNAME")
+        password = os.getenv("OXYLABS_PASSWORD")
+        address = os.getenv("OXYLABS_ADDRESS", "dc.oxylabs.io")
+        port = os.getenv("OXYLABS_PORT", "8000")   
+        ip = os.getenv("OXYLABS_IP")
+
+        if not username or not password:
+            raise ValueError("OXYLABS_USERNAME and OXYLABS_PASSWORD is required")
+        if not address or not port:
+            raise ValueError("OXYLABS_ADDRESS and OXYLABS_PORT is required")
+        
+        if not username.startswith("user-"):
+            username = f"user-{username}"
+
+        return ProxyConfig(
+            server=f"http://{address}:{port}",
+            username=username,
+            password=password,
+            ip=ip
+        )
+        
     def to_dict(self) -> Dict:
         """Convert to dictionary representation."""
         return {
