@@ -25,13 +25,16 @@ x-base-config: &base-config
     timeout: 10s
     retries: 3
     start_period: 40s
-  user: "appuser"
+  # user: "${USER_ID:-1000}:${GROUP_ID:-1000}" # Commented out - run as root
 
 services:
   crawl4ai:
     # 1. Default: Pull multi-platform test image from Docker Hub
     # 2. Override with local image via: IMAGE=local-test docker compose up
     image: ${IMAGE:-unclecode/crawl4ai:${TAG:-latest}}
+
+    # Force platform for cross-architecture compatibility
+    platform: linux/amd64
 
     # Local build config (used with --build)
     build:
@@ -40,6 +43,8 @@ services:
       args:
         INSTALL_TYPE: ${INSTALL_TYPE:-default}
         ENABLE_GPU: ${ENABLE_GPU:-false}
+      # Force build platform
+      platform: linux/amd64
 
     # Inherit shared config
     <<: *base-config
