@@ -43,8 +43,6 @@ services:
       args:
         INSTALL_TYPE: ${INSTALL_TYPE:-default}
         ENABLE_GPU: ${ENABLE_GPU:-false}
-      # Force build platform
-      platform: linux/amd64
 
     # Inherit shared config
     <<: *base-config
