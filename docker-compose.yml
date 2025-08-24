@@ -31,7 +31,7 @@ services:
   crawl4ai:
     # 1. Default: Pull multi-platform test image from Docker Hub
     # 2. Override with local image via: IMAGE=local-test docker compose up
-    image: ${IMAGE:-unclecode/crawl4ai:${TAG:-latest}}
+    #image: ${IMAGE:-unclecode/crawl4ai:${TAG:-latest}}
 
     # Force platform for cross-architecture compatibility
     platform: linux/amd64
